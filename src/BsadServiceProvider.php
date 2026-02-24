@@ -3,6 +3,11 @@
 namespace NobelzSushank\Bsad;
 
 use Illuminate\Support\ServiceProvider;
+use NobelzSushank\Bsad\Console\UpdateDataCommand;
+use NobelzSushank\Bsad\Contracts\CalendarDataProvider;
+use NobelzSushank\Bsad\Converters\BsadConverter;
+use NobelzSushank\Bsad\Data\JsonCalendarDataProvider;
+use NobelzSushank\Bsad\Formatting\Formatter;
 
 class BsadServiceProvider extends ServiceProvider
 {

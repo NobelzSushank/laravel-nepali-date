@@ -1,11 +1,10 @@
 <?php
 
 return [
-    // Published data path (users can edit this file themselves)
+    // Published data path
     'data_path' => storage_path('app/bsad/bsad.json'),
 
-    // Optional: where bs:update-data fetches a new dataset JSON from
-    // e.g. your GitHub release raw URL
+    // Optional: where command php artisan bs:update-data fetches a new dataset JSON from
     'update_url' => env('BSAD_UPDATE_URL', null),
 
     // If true, keep backups when updating

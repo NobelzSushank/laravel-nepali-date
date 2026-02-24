@@ -3,6 +3,9 @@
 namespace NobelzSushank\Bsad\Converters;
 
 use Carbon\CarbonImmutable;
+use NobelzSushank\Bsad\Contracts\CalendarDataProvider;
+use NobelzSushank\Bsad\Data\CalendarIndex;
+use NobelzSushank\Bsad\ValueObjects\BsDate;
 use RuntimeException;
 
 class BsadConverter
@@ -15,6 +18,11 @@ class BsadConverter
         $this->idx = $provider->index();
     }
 
+    /**
+     * Get metadata about the calendar dataset and configuration.
+     *
+     * @return array
+     */
     public function meta(): array
     {
         return [
@@ -28,6 +36,16 @@ class BsadConverter
         ];
     }
 
+    /**
+     * Convert a BS date to AD.
+     *
+     * @param int $bsYear
+     * @param int $bsMonth
+     * @param int $bsDay
+     *
+     * @return CarbonImmutable
+     * @throws RuntimeException if the input BS date is invalid or out of supported range.
+     */
     public function bsToAd(
         int $bsYear,
         int $bsMonth,
@@ -40,6 +58,14 @@ class BsadConverter
         return $this->idx->adAnchor->addDays($offsetDays);
     }
 
+    /**
+     * Convert an AD date to BS.
+     *
+     * @param string|DateTimeInterface $adDate
+     *
+     * @return BsDate
+     * @throws RuntimeException
+     */
     public function adToBs(string|\DateTimeInterface $adDate): BsDate
     {
         $ad = CarbonImmutable::parse($adDate, $this->idx->tz)->startOfDay();
@@ -48,20 +74,48 @@ class BsadConverter
         return $this->bsFromAnchorOffset($diff);
     }
 
+    /**
+     * Convenience methods for string outputs
+     *
+     * @param int $y
+     * @param int $m
+     * @param int $d
+     *
+     * @return string
+     * @throws RuntimeException
+     */
     public function bsToAdDateString(int $y, int $m, int $d): string
     {
         return $this->bsToAd($y, $m, $d)->toDateString();
     }
 
+    /**
+     * Convenience method for string output
+     *
+     * @param string|DateTimeInterface $adDate
+     *
+     * @return string
+     * @throws RuntimeException
+     */
     public function adToBsString(string|\DateTimeInterface $adDate): string
     {
         return (string) $this->adToBs($adDate);
     }
 
+    /**
+     * Validate the given BS date components against the dataset's supported range and structure.
+     *
+     * @param int $y
+     * @param int $m
+     * @param int $d
+     *
+     * @return void
+     * @throws RuntimeException
+     */
     private function assertValidBs(int $y, int $m, int $d): void
     {
         if (!$this->idx->hasYear($y)) {
-            throw new RuntimeException("Unsupported BS year {$y}. Dataset supports {$this->idx->minYear}-{$this->idx->maxYear}.");
+            throw new RuntimeException("Unsupported BS year {$y}. Dataset supports {$this->idx->minYear()}-{$this->idx->maxYear()}.");
         }
 
         if ($m < 1 || $m > 12) {
@@ -74,6 +128,15 @@ class BsadConverter
         }
     }
 
+    /**
+     * Calculate the number of days between the given BS date and the anchor BS date.
+     *
+     * @param int $y
+     * @param int $m
+     * @param int $d
+     *
+     * @return int
+     */
     private function bsDaysFromAnchor(int $y, int $m, int $d): int
     {
         $ay = $this->idx->bsAnchorY;
@@ -84,7 +147,7 @@ class BsadConverter
             return 0;
         }
 
-        $forward = $this->comapreBs($y, $m, $d, $ay, $am, $ad) > 0;
+        $forward = $this->compareBs($y, $m, $d, $ay, $am, $ad) > 0;
 
         if ($forward) {
             $days = 0;
@@ -141,6 +204,14 @@ class BsadConverter
         return -$days;
     }
 
+    /**
+     * Calculate the BS date that is a given number of days offset from the anchor BS date.
+     *
+     * @param int
+     *
+     * @return BsDate
+     * @throws RuntimeException
+     */
     private function bsFromAnchorOffset(int $offsetDays): BsDate
     {
         $y = $this->idx->bsAnchorY;
@@ -230,18 +301,44 @@ class BsadConverter
         return new BsDate($y, $m, $d);
     }
 
-
+    /**
+     * Calculate the number of days remaining in the given BS month from the given date.
+     *
+     * @param int $y
+     * @param int $m
+     * @param int $d
+     *
+     * @return int
+     */
     private function remainingDaysInBsMonth(int $y, int $m, int $d): int
     {
         $max = $this->idx->daysInMonth($y, $m);
         return ($max - $d + 1);
     }
 
+    /**
+     * Calculate the number of days that have passed in the given BS month up to the given date.
+     *
+     * @param int $y
+     * @param int $m
+     * @param int $d
+     *
+     * @return int
+     */
     private function daysBeforeInBsMonth(int $y, int $m, int $d): int
     {
         return $d;
     }
 
+    /**
+     * Calculate the number of days remaining in the given BS year from the given date.
+     *
+     * @param int $y
+     * @param int $m
+     * @param int $d
+     *
+     * @return int
+     */
     private function remainingDaysInBsYear(int $y, int $m, int $d): int
     {
         $sum = $this->remainingDaysInBsMonth($y, $m, $d);
@@ -252,6 +349,15 @@ class BsadConverter
         return $sum;
     }
 
+    /**
+     * Calculate the number of days that have passed in the given BS year up to the given date.
+     *
+     * @param int $y
+     * @param int $m
+     * @param int $d
+     *
+     * @return int
+     */
     private function daysBeforeInBsYear(int $y, int $m, int $d): int
     {
         $sum = $this->daysBeforeInBsMonth($y, $m, $d);
@@ -261,6 +367,18 @@ class BsadConverter
         return $sum;
     }
 
+    /**
+     * Compare two BS dates.
+     *
+     * @param int $y1
+     * @param int $m1
+     * @param int $d1
+     * @param int $y2
+     * @param int $m2
+     * @param int $d2
+     *
+     * @return int Returns -1 if the first date is earlier, 1 if later, or 0 if they are the same.
+     */
     private function compareBs(int $y1, int $m1, int $d1, int $y2, int $m2, int $d2): int
     {
         return [$y1, $m1, $d1] <=> [$y2, $m2, $d2];

@@ -2,6 +2,7 @@
 
 namespace NobelzSushank\Bsad\Data;
 
+use NobelzSushank\Bsad\Contracts\CalendarDataProvider;
 use RuntimeException;
 
 class JsonCalendarDataProvider implements CalendarDataProvider
@@ -12,6 +13,11 @@ class JsonCalendarDataProvider implements CalendarDataProvider
     ) {
     }
 
+    /**
+     * Get the calendar index data.
+     *
+     * @return CalendarIndex
+     */
     public function index(): CalendarIndex
     {
         $path = file_exists($this->dataPath) ? $this->dataPath : $this->fallbackPath;
