@@ -1,0 +1,41 @@
+{
+    "name": "nobelzsushank/laravel-nepali-date",
+    "description": "A Laravel package to convert English Date (A.D.) to Nepali Date (B.S.) and vice versa.",
+    "type": "library",
+    "homepage": "https://sushankpokharel.com.np",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "NobelzSushank",
+            "email": "nobelsushank@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^10.0|^11.0",
+        "illuminate/console": "^10.0|^11.0",
+        "nesbot/carbon": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "NobelzSushank\\Bsad\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "NobelzSushank\\Bsad\\BsadServiceProvider"
+            ],
+            "aliases": {
+                "Bsad": "NobelzSushank\\Bsad\\Facades\\Bsad"
+            }
+        }
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.0|^9.0",
+        "phpunit/phpunit": "^10.0"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
