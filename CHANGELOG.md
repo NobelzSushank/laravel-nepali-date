@@ -7,10 +7,16 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 ## [Unreleased]
 
 ### Added
+- `BsDate::format()` for Carbon-like formatting of BS dates.
+- `BsDate::monthName()` and `BsDate::weekdayName()` helpers.
+- Carbon macros:
+  - `toBs()` (AD -> BS)
+  - `formatBs()` (AD -> BS -> formatted string)
+  - `formatAdLocalized()` (locale-aware AD month/weekday + optional Nepali digits)
 - Flexible input normalization for conversion methods:
   - **BS → AD** accepts ints, `BsDate`, arrays, and `"YYYY-MM-DD"`-style strings.
   - **AD → BS** accepts Carbon/DateTimeInterface, arrays, `(Y,m,d)` ints, and any Carbon-parseable string.
-- Expanded README examples for all supported input forms and outputs.
+- README expanded with full input examples for both directions (Packagist install flow).
 
 ### Changed
 - Composer constraints updated to support Laravel **9–12**:
@@ -20,15 +26,15 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
   - `nesbot/carbon`: `^2.0|^3.0`
 
 ### Fixed
-- Documentation corrected to use the actual Composer package name: `nobelzsushank/laravel-nepali-date`.
-- Clarified that the **active** dataset file is the published one under `storage/app/bsad/bsad.json`.
+- Clarified Blade usage: date strings must be quoted (e.g., `'2082-11-14'`), otherwise PHP evaluates it as math.
 
 ---
 
 ## [0.2.0] - 2026-02-26
 
 ### Added
-- `bsToAd()` and `adToBs()` now accept multiple input formats (string/array/object/int) while remaining compatible with the original `(y,m,d)` signature.
+- Flexible `bsToAd()` / `adToBs()` inputs (string/array/object/int) while keeping original signature compatibility.
+- Carbon macros and `BsDate` formatting helpers.
 
 ---
 
@@ -45,4 +51,3 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
   - Extensible token-based formatting (`Y,y,m,n,d,j,F,l`).
 - Facade + service provider auto-discovery for Laravel.
 - Orchestra Testbench coverage with a fixture dataset.
-

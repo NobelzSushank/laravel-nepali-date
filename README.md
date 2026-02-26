@@ -1,16 +1,16 @@
-# Laravel Nepali Date (BS ↔ AD) — NobelzSushank
+# Laravel Nepali Date (BS ↔ AD)
 
 A **data-driven** Bikram Sambat (BS) ↔ Gregorian (AD) date converter for Laravel.
 
 - ✅ **BS → AD** and **AD → BS**
+- ✅ **Flexible inputs** (string/array/Carbon/BsDate/ints)
 - ✅ **User-editable dataset** (JSON) stored in your app’s `storage/`
-- ✅ Optional **Artisan updater**: `php artisan bs:update-data` (pull latest dataset from a URL)
-- ✅ Formatting helpers: month names (English/Nepali), weekdays, Nepali digits
-- ✅ Flexible inputs for conversion methods (string/array/Carbon/etc.)
-- ✅ Designed to be **easy to extend** (add more tokens/locales later)
+- ✅ Optional dataset updater: `php artisan bs:update-data`
+- ✅ Formatter helpers: month names (EN/NP), weekdays (EN/NP), Nepali digits
+- ✅ Carbon macros + `BsDate` helpers for ergonomic usage
 
 > License: **MIT**  
-> Note: The **code** is MIT. The **calendar dataset** you ship/download should have a license/attribution that allows redistribution.
+> Note: The **code** is MIT. Ensure any **calendar dataset** you ship/download allows redistribution.
 
 ---
 
@@ -22,74 +22,13 @@ A **data-driven** Bikram Sambat (BS) ↔ Gregorian (AD) date converter for Larav
 
 ---
 
-## Composer Package Name
-
-This repository’s Composer package name is:
-
-```
-nobelzsushank/laravel-nepali-date
-```
-
-So you install it using that name (not `nobelzsushank/bsad`) unless you change the `"name"` field in this package’s `composer.json`.
-
----
-
 ## Installation
 
-### A) If published on Packagist (later)
 ```bash
 composer require nobelzsushank/laravel-nepali-date
 ```
 
-### B) Install directly from GitHub (recommended while testing)
-
-1) Add a VCS repository entry in your Laravel app’s `composer.json`:
-
-```json
-{
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/NobelzSushank/laravel-nepali-date"
-    }
-  ]
-}
-```
-
-2) Require the dev branch:
-
-```bash
-./vendor/bin/sail composer require nobelzsushank/laravel-nepali-date:dev-main
-```
-
-If your default branch is `master`, use `:dev-master`.
-
-#### Private repo note
-If the repo is private, Composer will ask for a GitHub token. Use a fine-grained token with **Contents: Read** for the specific repo.
-
----
-
-### C) Local development (path repository)
-
-If your package lives on disk next to your Laravel app:
-
-```json
-{
-  "repositories": [
-    { "type": "path", "url": "../laravel-nepali-date", "options": { "symlink": true } }
-  ]
-}
-```
-
-Then:
-
-```bash
-./vendor/bin/sail composer require nobelzsushank/laravel-nepali-date:"*@dev"
-```
-
----
-
-## Publish config + dataset
+Publish config + dataset:
 
 ```bash
 php artisan vendor:publish --tag=bsad-config
@@ -105,7 +44,7 @@ This creates:
 
 ## Configuration
 
-`config/bsad.php`:
+`config/bsad.php` options:
 
 - `data_path` – where the app reads the dataset  
   Default: `storage/app/bsad/bsad.json`
@@ -117,7 +56,7 @@ This creates:
 Example `.env` (optional updater):
 
 ```env
-BSAD_UPDATE_URL=https://raw.githubusercontent.com/<YOUR_ORG>/<YOUR_DATA_REPO>/main/bsad.json
+BSAD_UPDATE_URL=https://example.com/bsad.json
 ```
 
 ---
@@ -125,10 +64,10 @@ BSAD_UPDATE_URL=https://raw.githubusercontent.com/<YOUR_ORG>/<YOUR_DATA_REPO>/ma
 ## Quick Usage
 
 ### AD → BS (including “today”)
+
 ```php
 use NobelzSushank\Bsad\Facades\Bsad;
 
-// Today in Nepal time:
 $bsToday = Bsad::adToBs(now('Asia/Kathmandu'));
 
 echo (string) $bsToday;  // "2082-11-12" (example)
@@ -138,16 +77,17 @@ echo $bsToday->day;      // day number
 ```
 
 ### BS → AD
+
 ```php
 use NobelzSushank\Bsad\Facades\Bsad;
 
-$ad = Bsad::bsToAd(2082, 11, 14);  // CarbonImmutable
+$ad = Bsad::bsToAd(2082, 11, 14);          // CarbonImmutable
 echo $ad->toDateString();
 
 echo Bsad::bsToAdDateString(2082, 11, 14); // "YYYY-MM-DD"
 ```
 
-> Blade example:
+> Blade example (remember: strings must be quoted)
 ```blade
 @php
   $ad = Bsad::bsToAd('2082-11-14');
@@ -159,7 +99,7 @@ echo Bsad::bsToAdDateString(2082, 11, 14); // "YYYY-MM-DD"
 
 ---
 
-## Flexible Inputs (BS → AD and AD → BS)
+## Flexible Inputs
 
 ### `bsToAd(...)` accepted inputs (BS → AD)
 
@@ -167,8 +107,8 @@ All of the following are supported:
 
 #### 1) Integers (classic)
 ```php
-Bsad::bsToAd(2082, 11, 14);        // -> CarbonImmutable
-Bsad::bsToAdDateString(2082, 11, 14); // -> "YYYY-MM-DD"
+Bsad::bsToAd(2082, 11, 14);
+Bsad::bsToAdDateString(2082, 11, 14);
 ```
 
 #### 2) String “YYYY-MM-DD” (also / . space separators)
@@ -232,67 +172,36 @@ Bsad::adToBs(['year' => 2026, 'month' => 2, 'day' => 26]);
 
 ---
 
-## Month/Year/Day helpers
+## Ergonomic APIs
 
-Because `adToBs()` returns a `BsDate` object:
+### `BsDate` helpers
+`adToBs()` returns a `BsDate` object with handy methods:
 
 ```php
 $bs = Bsad::adToBs(now('Asia/Kathmandu'));
 
-$year  = $bs->year;
-$month = $bs->month;
-$day   = $bs->day;
+echo $bs->format('Y F d, l', 'np', true);  // formatted BS string
+echo $bs->monthName('np');                 // BS month name
+echo $bs->weekdayName('en');               // weekday name
+echo $bs->toAd()->toDateString();          // convert back to AD
 ```
 
-For AD month/year/day, use Carbon:
+### Carbon macros
+The package registers Carbon macros so you can do:
 
 ```php
-$ad = Bsad::bsToAd('2082-11-14');
+$ad = now('Asia/Kathmandu');
 
-$year  = (int) $ad->format('Y');
-$month = (int) $ad->format('n');
-$day   = (int) $ad->format('j');
+echo $ad->formatBs('Y F d, l', 'np', true);          // AD -> BS -> formatted
+$bs = $ad->toBs();                                   // -> BsDate
+echo $ad->formatAdLocalized('Y F d, l', 'np', true);  // localized AD month/weekday + optional Nepali digits
 ```
+
+> Carbon’s built-in `format()` only accepts one argument, so we provide `formatBs()` and `formatAdLocalized()` macros.
 
 ---
 
-## Formatting (month names, weekdays, Nepali digits)
-
-Formatting is provided by the `Formatter` service:
-
-```php
-$conv = app(\NobelzSushank\Bsad\Converters\BsadConverter::class);
-$fmt  = app(\NobelzSushank\Bsad\Formatting\Formatter::class);
-
-$bs = $conv->adToBs('2026-02-24');
-
-// English month name
-echo $fmt->formatBs($bs, 'Y F d, l', 'en', false);
-
-// Nepali month name + Nepali digits
-echo $fmt->formatBs($bs, 'Y F d, l', 'np', true);
-```
-
-### Supported format tokens (BS)
-| Token | Meaning |
-|------:|---------|
-| `Y` | 4-digit BS year |
-| `y` | 2-digit BS year |
-| `m` | 2-digit BS month (`01`–`12`) |
-| `n` | BS month number (`1`–`12`) |
-| `d` | 2-digit BS day |
-| `j` | BS day number |
-| `F` | BS month name (locale-aware) |
-| `l` | weekday name (computed via converted AD date, locale-aware) |
-
-### Supported format tokens (AD)
-`Formatter::formatAd()` supports the same tokens, but based on the Gregorian date.
-
----
-
-## Updating the Dataset (No Manual Intervention)
-
-If you host a newer `bsad.json` (GitHub raw URL, S3, etc.), you can update the local dataset:
+## Updating the Dataset
 
 ```bash
 php artisan bs:update-data
@@ -307,6 +216,7 @@ php artisan bs:update-data --path="/full/path/to/bsad.json"
 
 ### Octane / queue workers
 If your app is long-running, reload after updating:
+
 - `php artisan octane:reload`
 - `php artisan queue:restart`
 
@@ -320,15 +230,9 @@ The active dataset is stored in:
 
 Users can edit that file directly to patch a year/month if needed.
 
-You can also point to a different file via `config/bsad.php`:
-
-```php
-'data_path' => storage_path('app/bsad/custom-bsad.json'),
-```
-
 ---
 
-## Dataset Format (and common error)
+## Dataset Format (common error)
 
 Your `bsad.json` must contain `meta.bs_anchor` as an object:
 
@@ -347,17 +251,16 @@ Your `bsad.json` must contain `meta.bs_anchor` as an object:
 }
 ```
 
-### If you see: `BSAD dataset meta.bs_anchor invalid`
-It means the JSON does **not** match the expected schema (often `bs_anchor` is missing, a string, or uses different keys).
+If you see:
 
-Quick reset:
+> `BSAD dataset meta.bs_anchor invalid`
+
+Reset:
 
 ```bash
 rm -f storage/app/bsad/bsad.json
 php artisan vendor:publish --tag=bsad-data --force
 ```
-
-Then open `storage/app/bsad/bsad.json` and verify the `meta.bs_anchor` block.
 
 ---
 
@@ -365,21 +268,9 @@ Then open `storage/app/bsad/bsad.json` and verify the `meta.bs_anchor` block.
 
 This package is **data-driven**, so supported years depend on your dataset.
 
-If you try to convert a year not present in `years`, you’ll get:
+If you try to convert a BS year not present in `years`, you’ll get:
 
 > Unsupported BS year XXXX. Dataset supports YYYY–ZZZZ.
-
-To extend support, update the dataset (new release / `bs:update-data` / user edit).
-
----
-
-## Testing (package repo)
-
-```bash
-composer test
-```
-
-(Assuming you add a script, e.g. `"test": "vendor/bin/phpunit"`.)
 
 ---
 

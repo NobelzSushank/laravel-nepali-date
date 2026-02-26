@@ -8,6 +8,7 @@ use NobelzSushank\Bsad\Contracts\CalendarDataProvider;
 use NobelzSushank\Bsad\Converters\BsadConverter;
 use NobelzSushank\Bsad\Data\JsonCalendarDataProvider;
 use NobelzSushank\Bsad\Formatting\Formatter;
+use NobelzSushank\Bsad\Support\CarbonMacros;
 
 class BsadServiceProvider extends ServiceProvider
 {
@@ -40,6 +41,8 @@ class BsadServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../resources/data/bsad.json' => storage_path('app/bsad/bsad.json'),
         ], 'bsad-data');
+
+        CarbonMacros::register();
 
         if ($this->app->runningInConsole()) {
             $this->commands([
