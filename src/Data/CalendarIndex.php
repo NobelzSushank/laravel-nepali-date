@@ -51,8 +51,29 @@ class CalendarIndex
 
         $bsAnchor = $meta['bs_anchor'] ?? null;
 
-        if (!is_array($bsAnchor) || !isset($bsAnchor['Y'], $bsAnchor['m'], $bsAnchor['d'])) {
-            throw new RuntimeException("BSAD dataset meta.bs_anchor invalid.");
+        if (is_string($bsAnchor)) {
+            $parts = explode('-', $bsAnchor);
+            if (count($parts) === 3) {
+                $bsAnchor = [
+                    'y' => (int) $parts[0],
+                    'm' => (int) $parts[1],
+                    'd' => (int) $parts[2],
+                ];
+            }
+        }
+
+        if (is_array($bsAnchor)) {
+            $y = $bsAnchor['y'] ?? $bsAnchor['year'] ?? null;
+            $m = $bsAnchor['m'] ?? $bsAnchor['month'] ?? null;
+            $d = $bsAnchor['d'] ?? $bsAnchor['day'] ?? null;
+
+            if ($y !== null && $m !== null && $d !== null) {
+                $bsAnchor['y'] = (int) $y;
+                $bsAnchor['m'] = (int) $m;
+                $bsAnchor['d'] = (int) $d;
+            } else {
+                throw new RuntimeException("Invalid date format.");
+            }
         }
 
         $self = new self();
