@@ -42,12 +42,12 @@ class BsFormatter
     ): string {
 
         // Use AD to get weekday
-        $ad = $this->conv->bsToAd($bs->year, $bs->month, $bs->day);
+        $ad = $this->conv->bsToAd($bs);
 
         $bsMonths = Locale::bsMonths($locale);
         $weekdays = Locale::weekdays($locale);
 
-        $replacements = [
+        $map = [
             'Y' => sprintf('%04d', $bs->year),
             'y' => substr(sprintf('%04d', $bs->year), -2),
             'm' => sprintf('%02d', $bs->month),
@@ -58,12 +58,22 @@ class BsFormatter
             'l' => $weekdays[$ad->dayOfWeek] ?? '',
         ];
 
-        $formatted = strtr($pattern, $replacements);
+        $out = '';
+        $len = strlen($pattern);
 
-        if ($nepaliDigits) {
-            return NepaliDigits::toNepali($formatted);
+        for ($i = 0; $i < $len; $i++) {
+            $ch = $pattern[$i];
+
+            // Allow escaping: \Y prints literal "Y"
+            if ($ch === '\\' && $i + 1 < $len) {
+                $out .= $pattern[$i + 1];
+                $i++;
+                continue;
+            }
+
+            $out .= $map[$ch] ?? $ch;
         }
 
-        return $formatted;
+        return $nepaliDigits ? NepaliDigits::toNepali($out) : $out;
     }
 }

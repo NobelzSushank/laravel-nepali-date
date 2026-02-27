@@ -41,13 +41,33 @@ class BsDate
     }
 
     /**
-     * Format BS date (locale + nepali digits).
+     * Format BS date (token-based; locale-aware; optional Nepali digits).
+     *
+     * Supports:
+     *   $bs->format('Y F d, l', 'np', true)
+     * Also supports:
+     *   $bs->format('Y F d, l', true)   // boolean as 2nd arg = nepaliDigits
      */
-    public function format(string $pattern = 'Y-m-d', ?string $locale = null, ?bool $nepaliDigits = null): string
-    {
+    public function format(
+        string $pattern = 'Y-m-d',
+        string|bool|null $locale = null,
+        ?bool $nepaliDigits = null
+    ): string {
+        // If caller does: format(pattern, true)
+        if (is_bool($locale) && $nepaliDigits === null) {
+            $nepaliDigits = $locale;
+            $locale = null;
+        }
+
         /** @var Formatter $fmt */
         $fmt = app(Formatter::class);
-        return $fmt->formatBs($this, $pattern, $locale, $nepaliDigits);
+
+        return $fmt->formatBs(
+            $this,
+            $pattern,
+            is_string($locale) ? $locale : null,
+            $nepaliDigits
+        );
     }
 
     /**
