@@ -30,7 +30,7 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ---
 
-### [0.2.1] - 2026-03-01
+### [0.2.2] - 2026-03-02
 - Minor bug fixes and improvement.
 
 ---
