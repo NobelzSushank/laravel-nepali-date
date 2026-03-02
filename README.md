@@ -1,6 +1,6 @@
-# Laravel Nepali Date (BS ↔ AD)
+# Laravel Nepali Date Converter (BS ↔ AD)
 
-A **data‑driven** Bikram Sambat (BS) ↔ Gregorian (AD) converter for Laravel.
+A Laravel Nepali date converter for Bikram Sambat (BS) ↔ Gregorian (AD), with Carbon-like formatting, Nepali/English month names, and a user-editable dataset.
 
 This package is built so your application uses a **local dataset file in `storage/`** (not inside `vendor/`).  
 That means **your app can patch/update the calendar data manually** at any time — **without updating the package** — and your changes **won’t be overwritten** by `composer update`.
@@ -15,7 +15,7 @@ That means **your app can patch/update the calendar data manually** at any time 
   - No vendor edits required
   - Composer updates won’t overwrite your dataset
 - ✅ **Carbon‑like formatting**
-  - `BsDate::format('Y F d, l', 'np', true)`
+  - `NepaliDateConverter::format('Y F d, l', 'np', true)`
 - ✅ Output in **English or Nepali** (month names + weekday names)
 - ✅ Optional **Nepali digits** output
 - ✅ Clean API designed to be easy to extend (more tokens/locales later)
@@ -33,7 +33,7 @@ That means **your app can patch/update the calendar data manually** at any time 
 ## Installation (Packagist)
 
 ```bash
-composer require nobelzsushank/laravel-nepali-date
+composer require nobelzsushank/nepali-date-converter
 ```
 
 Publish config + dataset:
@@ -99,9 +99,9 @@ In `config/bsad.php`:
 ### AD → BS (including today)
 
 ```php
-use NobelzSushank\Bsad\Facades\Bsad;
+use NobelzSushank\Bsad\Facades\NepaliDateConverter;
 
-$bsToday = Bsad::adToBs(now('Asia/Kathmandu'));
+$bsToday = NepaliDateConverter::adToBs(now('Asia/Kathmandu'));
 
 echo (string) $bsToday;   // "2082-11-12" (example)
 echo $bsToday->year;      // 2082
@@ -112,16 +112,16 @@ echo $bsToday->day;       // 12
 ### BS → AD
 
 ```php
-use NobelzSushank\Bsad\Facades\Bsad;
+use NobelzSushank\Bsad\Facades\NepaliDateConverter;
 
-$ad = Bsad::bsToAd(2082, 11, 14);     // CarbonImmutable
+$ad = NepaliDateConverter::bsToAd(2082, 11, 14);     // CarbonImmutable
 echo $ad->toDateString();             // 2026-02-26
 
-echo Bsad::bsToAdDateString(2082, 11, 14); // 2026-02-26
+echo NepaliDateConverter::bsToAdDateString(2082, 11, 14); // 2026-02-26
 ```
 
 > ⚠️ Blade tip: BS date strings must be quoted  
-> `Bsad::bsToAd(2082-11-14)` is math in PHP. Use `'2082-11-14'`.
+> `NepaliDateConverter::bsToAd(2082-11-14)` is math in PHP. Use `'2082-11-14'`.
 
 ---
 
@@ -134,30 +134,30 @@ All of these are supported:
 #### 1) Integers (classic)
 
 ```php
-Bsad::bsToAd(2082, 11, 14);
-Bsad::bsToAdDateString(2082, 11, 14);
+NepaliDateConverter::bsToAd(2082, 11, 14);
+NepaliDateConverter::bsToAdDateString(2082, 11, 14);
 ```
 
 #### 2) String “YYYY-MM-DD” (also accepts `/`, `.`, spaces)
 
 ```php
-Bsad::bsToAd('2082-11-14')->toDateString();
-Bsad::bsToAd('2082/11/14')->toDateString();
-Bsad::bsToAd('2082.11.14')->toDateString();
-Bsad::bsToAd('2082 11 14')->toDateString();
+NepaliDateConverter::bsToAd('2082-11-14')->toDateString();
+NepaliDateConverter::bsToAd('2082/11/14')->toDateString();
+NepaliDateConverter::bsToAd('2082.11.14')->toDateString();
+NepaliDateConverter::bsToAd('2082 11 14')->toDateString();
 ```
 
 #### 3) List array
 
 ```php
-Bsad::bsToAd([2082, 11, 14])->toDateString();
+NepaliDateConverter::bsToAd([2082, 11, 14])->toDateString();
 ```
 
 #### 4) Associative array
 
 ```php
-Bsad::bsToAd(['y' => 2082, 'm' => 11, 'd' => 14])->toDateString();
-Bsad::bsToAd(['year' => 2082, 'month' => 11, 'day' => 14])->toDateString();
+NepaliDateConverter::bsToAd(['y' => 2082, 'm' => 11, 'd' => 14])->toDateString();
+NepaliDateConverter::bsToAd(['year' => 2082, 'month' => 11, 'day' => 14])->toDateString();
 ```
 
 #### 5) `BsDate` object
@@ -165,7 +165,7 @@ Bsad::bsToAd(['year' => 2082, 'month' => 11, 'day' => 14])->toDateString();
 ```php
 use NobelzSushank\Bsad\ValueObjects\BsDate;
 
-Bsad::bsToAd(new BsDate(2082, 11, 14))->toDateString();
+NepaliDateConverter::bsToAd(new BsDate(2082, 11, 14))->toDateString();
 ```
 
 ✅ `bsToAd()` returns a **CarbonImmutable** in timezone `Asia/Kathmandu` (from dataset meta).
@@ -179,27 +179,27 @@ All of these are supported:
 #### 1) Any Carbon-parseable string
 
 ```php
-Bsad::adToBs('2026-02-26');                  // -> BsDate
-Bsad::adToBs('2026-02-26 10:30:00');         // time ignored (startOfDay)
-Bsad::adToBs('next monday');                 // Carbon parsing rules apply
-Bsad::adToBsString('2026-02-26');            // -> "YYYY-MM-DD" (BS)
+NepaliDateConverter::adToBs('2026-02-26');                  // -> BsDate
+NepaliDateConverter::adToBs('2026-02-26 10:30:00');         // time ignored (startOfDay)
+NepaliDateConverter::adToBs('next monday');                 // Carbon parsing rules apply
+NepaliDateConverter::adToBsString('2026-02-26');            // -> "YYYY-MM-DD" (BS)
 ```
 
 #### 2) Carbon / DateTimeInterface
 
 ```php
-Bsad::adToBs(now('Asia/Kathmandu'));
-Bsad::adToBs(now()->toImmutable());
-Bsad::adToBs(new DateTime('2026-02-26'));
+NepaliDateConverter::adToBs(now('Asia/Kathmandu'));         // 2082-11-14
+NepaliDateConverter::adToBs(now()->toImmutable());          // 2082-11-14
+NepaliDateConverter::adToBs(new DateTime('2026-02-26'));    // 2082-11-14
 ```
 
 #### 3) Integers or arrays
 
 ```php
-Bsad::adToBs(2026, 2, 26);
-Bsad::adToBs([2026, 2, 26]);
-Bsad::adToBs(['y' => 2026, 'm' => 2, 'd' => 26]);
-Bsad::adToBs(['year' => 2026, 'month' => 2, 'day' => 26]);
+NepaliDateConverter::adToBs(2026, 2, 26);
+NepaliDateConverter::adToBs([2026, 2, 26]);
+NepaliDateConverter::adToBs(['y' => 2026, 'm' => 2, 'd' => 26]);
+NepaliDateConverter::adToBs(['year' => 2026, 'month' => 2, 'day' => 26]);
 ```
 
 ✅ `adToBs()` returns a **BsDate** value object (`year`, `month`, `day`).
@@ -213,7 +213,7 @@ Bsad::adToBs(['year' => 2026, 'month' => 2, 'day' => 26]);
 `adToBs()` returns a `BsDate` which supports:
 
 ```php
-$bs = Bsad::adToBs(now('Asia/Kathmandu'));
+$bs = NepaliDateConverter::adToBs(now('Asia/Kathmandu'));
 
 // Nepali month + weekday + Nepali digits
 echo $bs->format('Y F d, l', 'np', true);
@@ -228,7 +228,7 @@ echo $bs->format(); // "YYYY-MM-DD"
 ### 2) BS helpers: month/weekday names
 
 ```php
-$bs = Bsad::adToBs(now('Asia/Kathmandu'));
+$bs = NepaliDateConverter::adToBs(now('Asia/Kathmandu'));
 
 echo $bs->monthName('np');     // e.g. "फाल्गुण"
 echo $bs->monthName('en');     // e.g. "Falgun"

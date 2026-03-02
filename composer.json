@@ -1,6 +1,6 @@
 {
-    "name": "nobelzsushank/laravel-nepali-date",
-    "description": "A Laravel package to convert English Date (A.D.) to Nepali Date (B.S.) and vice versa.",
+    "name": "nobelzsushank/nepali-date-converter",
+    "description": "Laravel Nepali Date Converter (BS to AD and AD to BS) package with carbon like formatting and user-editable dataset.",
     "type": "library",
     "keywords": [
         "nobelzsushank",
@@ -10,9 +10,22 @@
         "nepali-date-converter",
         "bsToAd",
         "asToBs",
-        "bsad"
+        "bsad",
+        "nepali date converter",
+        "date-converter",
+        "bikram sambat",
+        "bs",
+        "ad",
+        "bs-to-ad",
+        "ad-to-bs",
+        "carbon",
+        "nepal"
     ],
-    "homepage": "https://sushankpokharel.com.np",
+    "homepage": "https://github.com/NobelzSushank/nepali-date-converter",
+    "support": {
+        "source": "https://github.com/NobelzSushank/nepali-date-converter",
+        "issues": "https://github.com/NobelzSushank/nepali-date-converter/issues"
+    },
     "license": "MIT",
     "authors": [
         {
@@ -38,7 +51,7 @@
                 "NobelzSushank\\Bsad\\BsadServiceProvider"
             ],
             "aliases": {
-                "Bsad": "NobelzSushank\\Bsad\\Facades\\Bsad"
+                "NepaliDateConverter": "NobelzSushank\\Bsad\\Facades\\NepaliDateConverter"
             }
         }
     },

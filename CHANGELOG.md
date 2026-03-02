@@ -31,6 +31,11 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 ---
 
 ### [0.2.1] - 2026-03-01
+- Minor bug fixes and improvement.
+
+---
+
+### [0.2.1] - 2026-03-01
 - Correct formatting output for patterns like `Y F d, l` (previously could fall back to `YYYY-MM-DD`).
 - Clarified Blade usage: date strings must be quoted (e.g., `'2082-11-14'`) to avoid PHP math evaluation.
 
